@@ -1,0 +1,38 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: velos-api
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: velos-api
+  template:
+    metadata:
+      labels:
+        app: velos-api
+    spec:
+      containers:
+      - name: velos-api
+        image: velos-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: velos-config
+        - secretRef:
+            name: velos-db-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: velos-api-service
+spec:
+  selector:
+    app: velos-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort
